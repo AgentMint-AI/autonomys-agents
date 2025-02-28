@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router } from 'express';
 import {
   createCharacter,
   getAllCharactersStatus,
@@ -11,7 +11,7 @@ import {
   updateSchedule,
 } from '../controllers/characterController.js';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 router.post('/', createCharacter);
 router.post('/:name/start', startCharacter);

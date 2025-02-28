@@ -1,0 +1,8 @@
+node_modules
+dist
+.git
+.env
+*.log
+memories/*
+characters/*
+!characters/character.example/ 

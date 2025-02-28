@@ -1,5 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 
+// Extend Express Request type to include id
+declare global {
+  namespace Express {
+    interface Request {
+      id?: string;
+    }
+  }
+}
+
 export const requestLogger = (req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
 

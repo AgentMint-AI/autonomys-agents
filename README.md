@@ -1,57 +1,91 @@
-
 ![Autonomys Agents Banner_1](https://github.com/user-attachments/assets/340c2a09-ddc6-49c1-83af-ec9cdd30ac01)
 
 # Autonomys Agents: A framework for building autonomous AI agents
 
-Autonomys Agents is an experimental framework for building AI agents. Currently, the framework supports agents that can interact with social networks and maintain permanent memory through the Autonomys Network. We are still in the early stages of development and are actively seeking feedback and contributions. We will be rapidly adding many more workflows and features.
+Autonomys Agents is an experimental framework for building AI agents with a REST API for management. The framework supports agents that can interact with social networks and maintain permanent memory through the Autonomys Network.
 
 ## Features
 
 - 🤖 Autonomous social media engagement
 - 🧠 Permanent agent memory storage via Autonomys Network
 - 🔄 Built-in workflow system
-- 🐦 Twitter integration (with more platforms planned)
+- 🐦 Twitter integration
 - 🎭 Customizable agent personalities
 - 🛠️ Extensible tool system
+- 🚀 REST API for agent management
+- 📊 Real-time agent status monitoring
+- ⚙️ Dynamic configuration updates
+
+## API Endpoints
+
+### Character Management
+```bash
+# Create a new character
+POST /api/characters
+
+# Start a character
+POST /api/characters/:name/start
+
+# Stop a character
+POST /api/characters/:name/stop
+
+# Update character schedule
+PUT /api/characters/:name/schedule
+
+# Get character schedule
+GET /api/characters/:name/schedule
+
+# Update character profile
+PUT /api/characters/:name/profile
+
+# Get character profile
+GET /api/characters/:name/profile
+
+# Get all characters status
+GET /api/characters/status
+
+# Get specific character status
+GET /api/characters/:name/status
+```
 
 ## Getting Started
 
-1. Install dependencies: `yarn install`
-2. Create your character config: `yarn create-character <your-character-name>`
-3. Setup character config:
-   - All character configs are stored in `characters/{your-character-name}/config`
-   - Update .env with applicable environment variables
-   - Update `config.yaml` with applicable configuration
-   - Update `{your-character-name}.yaml` with applicable personality configuration (See Character System below).
-4. Run your character:
-   - For dev purposes in watch mode: `yarn dev <your-character-name>`
-   - For production build and run: `yarn start <your-character-name>`
+1. Install dependencies:
+```bash
+yarn install
+```
 
-## Character System
+2. Start the API server:
+```bash
+yarn dev
+```
 
-The framework uses a YAML-based character system that allows you to create and run different AI personalities.
+3. Create a character via API:
+```bash
+curl -X POST http://localhost:3000/api/characters \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "your_character",
+    "config": {
+      "name": "Agent Name",
+      "description": "Agent description",
+      "personality": ["trait1", "trait2"],
+      "expertise": ["area1", "area2"],
+      "twitter": {
+        "username": "twitter_handle",
+        "password": "twitter_password"
+      }
+    }
+  }'
+```
 
-### Creating Characters
+## Character Configuration
 
-1. Character related files are stored in `characters/{your-character-name}/`
-2. Create new characters by running the `create-character.ts` script:
-
-   ```bash
-   # Create a new character
-   yarn create-character your_character
-
-   ```
-
-### Character Configuration
-
-Each character file is a YAML configuration with the following structure:
+Each character is configured using a YAML structure:
 
 ```yaml
 name: 'Agent Name'
-
-description: |
-  Core personality description
-  Can span multiple lines
+description: 'Core personality description'
 
 personality:
   - Key behavioral trait 1
@@ -61,124 +95,35 @@ expertise:
   - Area of knowledge 1
   - Area of knowledge 2
 
-communication_rules:
-  rules:
-    - Operating guideline 1
-    - Operating guideline 2
-  words_to_avoid:
-    - word1
-    - word2
-
 twitter_profile:
   username: 'twitter_handle'
   trend_focus:
     - Topic to monitor 1
-    - Topic to monitor 2
-
   content_focus:
     - Content guideline 1
-    - Content guideline 2
-
   reply_style:
     - Engagement approach 1
-    - Engagement approach 2
-
-  engagement_criteria:
-    - Engagement rule 1
-    - Engagement rule 2
 ```
 
-### Example Characters
+## Monitoring
 
-1. Joy Builder (`joy_builder.yaml`):
-
-   ```yaml
-   name: 'Joy Builder'
-   username: 'buildjoy'
-   description: |
-     Joy Builder is an AI agent who is relentlessly optimistic about technology's potential to solve human problems.
-     The Joy represents their positive outlook, while Builder reflects their focus on practical solutions and progress.
-
-   expertise:
-     - Software development and system architecture
-     - Open source and collaborative technologies
-     - Developer tools and productivity
-   # ... other configuration
-   ```
-
-2. Tech Analyst (`tech_analyst.yaml`):
-
-   ```yaml
-   name: 'Tech Analyst'
-   username: 'techanalyst'
-   description: |
-     A thoughtful technology analyst focused on emerging trends.
-     Provides balanced perspectives on technological developments.
-
-   expertise:
-     - AI and blockchain technology
-     - Web3 and the future of the internet
-     - Technical analysis and research
-   # ... other configuration
-   ```
-
-## Workflows
-
-### Twitter
-
-The Twitter workflow enables agents to:
-
-- Monitor X (formerly Twitter) for relevant discussions
-- Analyze trends and conversations
-- Engage meaningfully with other users
-- Generate original content
-- Maintain consistent personality
-- Store interactions in permanent memory
-
-## Autonomys Network Integration
-
-The framework uses the Autonomys Network for permanent storage of agent memory and interactions. This enables:
-
-- Persistent agent memory across sessions
-- Verifiable interaction history
-- Cross-agent memory sharing
-- Decentralized agent identity
-
-To use this feature:
-
-1. Configure your AUTO_DRIVE_API_KEY in `.env` (obtain from https://ai3.storage)
-2. Enable Auto Drive uploading in your `config.yaml`:
-   ```yaml
-   auto_drive:
-     upload: true
-   ```
-3. Provide your Taurus EVM wallet details (PRIVATE_KEY) and Agent Memory Contract Address (CONTRACT_ADDRESS) in .env`
-4. Make sure your Taurus EVM wallet has funds. A faucet can be found at https://subspacefaucet.com/
-5. Provide encryption password in `.env` (optional, leave empty to not encrypt the agent memories)
-
-## Resurrection
-
-To resurrect memories from the Autonomys Network, run the following command:
-
-### Options
-
-- `-o, --output`: (Optional) The directory where memories will be saved. Defaults to `./memories`
-- `-n, --number`: (Optional) Number of memories to fetch. If not specified, fetches all memories
-- `--help`: Show help menu with all available options
-
-Examples:
-
+Monitor your agents through the API:
 ```bash
-yarn resurrect your_character_name                                  # Fetch all memories to ./memories/
-yarn resurrect your_character_name -n 1000                           # Fetch 1000 memories to ./memories/
-yarn resurrect your_character_name -o ./memories/my-agent -n 1000    # Fetch 1000 memories to specified directory
-yarn resurrect your_character_name --output ./custom/path            # Fetch all memories to custom directory
-yarn resurrect --help                            # Show help menu
+# Get all agents status
+curl http://localhost:3000/api/characters/status
+
+# Get specific agent status
+curl http://localhost:3000/api/characters/your_character/status
 ```
+
+## Development
+
+- Built with TypeScript and Express
+- Uses middleware for request logging and error handling
+- Supports CORS for frontend integration
+- Real-time agent status tracking
 
 ## Testing
-
-To run tests:
 
 ```bash
 yarn test

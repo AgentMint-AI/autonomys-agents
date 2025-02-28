@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import fs from 'fs/promises';
 import path from 'path';
 import yaml from 'yaml';
@@ -182,7 +182,7 @@ const processStats = new Map<
   }
 >();
 
-export const createCharacter = async (req: Request, res: Response) => {
+export const createCharacter: RequestHandler = async (req, res) => {
   try {
     const { name, config } = req.body as CreateCharacterRequest;
     const targetDir = path.join(rootDir, 'characters', name, 'config');
@@ -369,7 +369,7 @@ AGENT_VERSION=2.0.0
   }
 };
 
-export const startCharacter = async (req: Request, res: Response) => {
+export const startCharacter: RequestHandler = async (req, res) => {
   const { name } = req.params;
 
   try {
@@ -413,12 +413,13 @@ export const startCharacter = async (req: Request, res: Response) => {
   }
 };
 
-export const stopCharacter = async (req: Request, res: Response) => {
+export const stopCharacter: RequestHandler = async (req, res) => {
   const { name } = req.params;
 
   const process = runningProcesses.get(name);
   if (!process) {
-    return res.status(404).json({ error: 'Character is not running' });
+    res.status(404).json({ error: 'Character is not running' });
+    return;
   }
 
   try {
@@ -427,13 +428,36 @@ export const stopCharacter = async (req: Request, res: Response) => {
     processStartTimes.delete(name);
     processStats.delete(name);
     res.json({ message: 'Character stopped successfully' });
+    return;
   } catch (error) {
     console.error('Error stopping character:', error);
     res.status(500).json({ error: 'Failed to stop character' });
+    return;
   }
 };
 
-export const updateSchedule = async (req: Request, res: Response) => {
+// Helper function for restarting character
+const restartCharacter = async (name: string, res: Response) => {
+  const process = runningProcesses.get(name);
+  if (process) {
+    process.kill();
+    runningProcesses.delete(name);
+    // Create a proper Request object
+    const req = {
+      params: { name },
+      // Add other required Request properties
+      get: () => undefined,
+      header: () => undefined,
+      accepts: () => false,
+      acceptsCharsets: () => false,
+      // ... other required properties
+    } as unknown as Request;
+
+    await startCharacter(req, res, () => {});
+  }
+};
+
+export const updateSchedule: RequestHandler = async (req, res) => {
   const { name } = req.params;
   const updates = req.body as ScheduleUpdateRequest;
 
@@ -477,13 +501,8 @@ export const updateSchedule = async (req: Request, res: Response) => {
     await fs.writeFile(configPath, yaml.stringify(config));
     await fs.writeFile(characterPath, yaml.stringify(character));
 
-    // Restart the character if it's running
-    const process = runningProcesses.get(name);
-    if (process) {
-      process.kill();
-      runningProcesses.delete(name);
-      await startCharacter({ params: { name } } as Request, res);
-    }
+    // Use the new helper function
+    await restartCharacter(name, res);
 
     res.json({ message: 'Schedule updated successfully' });
   } catch (error) {
@@ -492,7 +511,7 @@ export const updateSchedule = async (req: Request, res: Response) => {
   }
 };
 
-export const getSchedule = async (req: Request, res: Response) => {
+export const getSchedule: RequestHandler = async (req, res) => {
   const { name } = req.params;
 
   try {
@@ -523,7 +542,7 @@ export const getSchedule = async (req: Request, res: Response) => {
   }
 };
 
-export const updateCharacterProfile = async (req: Request, res: Response) => {
+export const updateCharacterProfile: RequestHandler = async (req, res) => {
   const { name } = req.params;
   const updates = req.body as CharacterProfileUpdate;
 
@@ -549,13 +568,8 @@ export const updateCharacterProfile = async (req: Request, res: Response) => {
     // Write updated config back to file
     await fs.writeFile(characterPath, yaml.stringify(character));
 
-    // Restart the character if it's running
-    const process = runningProcesses.get(name);
-    if (process) {
-      process.kill();
-      runningProcesses.delete(name);
-      await startCharacter({ params: { name } } as Request, res);
-    }
+    // Use the new helper function
+    await restartCharacter(name, res);
 
     res.json({
       message: 'Character profile updated successfully',
@@ -567,7 +581,7 @@ export const updateCharacterProfile = async (req: Request, res: Response) => {
   }
 };
 
-export const getCharacterProfile = async (req: Request, res: Response) => {
+export const getCharacterProfile: RequestHandler = async (req, res) => {
   const { name } = req.params;
 
   try {
@@ -590,7 +604,7 @@ export const getCharacterProfile = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllCharactersStatus = async (req: Request, res: Response) => {
+export const getAllCharactersStatus: RequestHandler = async (req, res) => {
   try {
     const charactersDir = path.join(rootDir, 'characters');
     const characters = await fs.readdir(charactersDir);
@@ -620,7 +634,7 @@ export const getAllCharactersStatus = async (req: Request, res: Response) => {
   }
 };
 
-export const getCharacterStatus = async (req: Request, res: Response) => {
+export const getCharacterStatus: RequestHandler = async (req, res) => {
   const { name } = req.params;
 
   try {
