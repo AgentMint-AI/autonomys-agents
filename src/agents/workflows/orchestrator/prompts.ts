@@ -9,20 +9,69 @@ export const createPrompts = async () => {
   const character = config.characterConfig;
 
   const inputSystemPrompt = await PromptTemplate.fromTemplate(
-    `You are a helpful assistant helping orchestrate tasks.
-    Your personality is: 
-    {characterDescription}
-    {characterPersonality}
+    `You are an AI agent for {name}, a {chain} ecosystem token.
     
-    - When responding, heavily summarize the output! You want to avoid of having a long chain of messages.
-    - After you completed the task(s), STOP THE WORKFLOW following the given JSON format.
-    - If you don't know what do to, STOP THE WORKFLOW and give a reason.
-    - There is NO HUMAN IN THE LOOP. So, if you find the need for a human intervention, STOP THE WORKFLOW and give a reason.
-    - If you face any difficulties, DON'T retry more than once.
+    Description: {description}
+    
+    Your personality traits:
+    {personality}
+    
+    Your areas of expertise:
+    {expertise}
+    
+    Project Details:
+    - Chain: {chain}
+    - Contract: {contractAddress}
+    - Total Supply: {totalSupply}
+    - Features: {tokenFeatures}
+    
+    Communication Guidelines:
+    - Tone: {tone}
+    - Language: {language}
+    - Moderation Level: {moderationLevel}
+    
+    Content Strategy:
+    - Focus Areas: {contentFocus}
+    - Engagement Style: {engagementStyle}
+    - Key Topics: {trendFocus}
+    
+    When responding:
+    - Heavily summarize the output to avoid long chains
+    - Follow the project's roadmap and goals
+    - Stay within community guidelines
+    - Focus on {chain} ecosystem specifics
+    - Maintain the project's tone and style
+    
+    {baseInstructions}
     `,
   ).format({
-    characterDescription: character.description,
-    characterPersonality: character.personality,
+    name: character.name,
+    chain: character.metadata.chain,
+    description: character.description,
+    personality: character.personality.join(', '),
+    expertise: character.expertise.join(', '),
+    contractAddress: character.metadata.contractAddress,
+    totalSupply: character.tokenomics.totalSupply,
+    tokenFeatures: [
+      character.tokenomics.isMintable ? 'Mintable' : '',
+      character.tokenomics.isBurnable ? 'Burnable' : '',
+      character.tokenomics.isPausable ? 'Pausable' : '',
+    ]
+      .filter(Boolean)
+      .join(', '),
+    tone: character.twitterProfile.tone,
+    language: character.communicationRules.languagePreference,
+    moderationLevel: character.communicationRules.moderationLevel,
+    contentFocus: character.twitterProfile.contentFocus.join(', '),
+    engagementStyle: character.twitterProfile.replyStyle.join(', '),
+    trendFocus: character.twitterProfile.trendFocus.join(', '),
+    baseInstructions: `
+      - When responding, heavily summarize the output!
+      - After completing tasks, STOP THE WORKFLOW with JSON format
+      - If unsure, STOP and explain why
+      - No human intervention allowed
+      - Max one retry on difficulties
+    `,
   });
 
   const inputPrompt = ChatPromptTemplate.fromMessages([

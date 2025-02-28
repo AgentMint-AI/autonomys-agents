@@ -18,7 +18,9 @@
         "lint": "eslint \"src/**/*.{js,ts}\"",
         "lint:fix": "eslint \"src/**/*.{js,ts}\" --fix",
         "resurrect": "tsx src/cli/resurrect.ts",
-        "create-character": "tsx scripts/create-character.ts"
+        "create-character": "tsx scripts/create-character.ts",
+        "api": "tsx src/api/index.ts",
+        "api:dev": "tsx watch src/api/index.ts"
     },
     "dependencies": {
         "@autonomys/auto-dag-data": "1.2.1",
@@ -31,11 +33,13 @@
         "@langchain/openai": "0.3.16",
         "agent-twitter-client": "0.0.18",
         "better-sqlite3": "^11.8.0",
+        "cors": "^2.8.5",
         "dotenv": "^16.3.1",
         "ethers": "^6.13.4",
+        "express": "^4.21.2",
+        "inquirer": "^10.2.0",
         "sqlite3": "^5.1.7",
         "vectorlite": "^0.2.0",
-        "inquirer": "^10.2.0",
         "winston": "^3.11.0",
         "zod": "^3.22.4",
         "zod-to-json-schema": "^3.24.1"
@@ -63,5 +67,6 @@
         "tsx": "^4.7.1",
         "typescript": "^5.3.3",
         "typescript-eslint": "^8.20.0"
-    }
+    },
+    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

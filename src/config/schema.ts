@@ -144,6 +144,10 @@ const characterConfigSchema = z.object({
   communicationRules: z.object({
     rules: z.array(z.string()),
     wordsToAvoid: z.array(z.string()),
+    allowedTopics: z.array(z.string()),
+    bannedTopics: z.array(z.string()),
+    moderationLevel: z.string(),
+    languagePreference: z.string(),
   }),
   twitterProfile: z.object({
     username: z.string(),
@@ -151,7 +155,46 @@ const characterConfigSchema = z.object({
     contentFocus: z.array(z.string()),
     engagementCriteria: z.array(z.string()),
     replyStyle: z.array(z.string()),
+    contentTypes: z.object({
+      text: z.boolean(),
+      polls: z.boolean(),
+      threads: z.boolean(),
+      spaces: z.boolean(),
+    }),
+    postFrequency: z.string(),
+    tone: z.string(),
   }),
+  tokenomics: z.object({
+    isMintable: z.boolean(),
+    isBurnable: z.boolean(),
+    isPausable: z.boolean(),
+    totalSupply: z.string(),
+    circulatingSupply: z.string().optional(),
+    marketCap: z.string().optional(),
+    price: z.string().optional(),
+  }),
+  metadata: z.object({
+    website: z.string(),
+    telegram: z.string(),
+    discord: z.string(),
+    chain: z.string(),
+    contractAddress: z.string(),
+  }),
+  team: z.array(
+    z.object({
+      name: z.string(),
+      role: z.string(),
+      socials: z.record(z.string()),
+    }),
+  ),
+  roadmap: z.array(
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      date: z.string(),
+      completed: z.boolean(),
+    }),
+  ),
 });
 
 const memoryConfigSchema = z.object({
